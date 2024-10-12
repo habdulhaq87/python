@@ -2,10 +2,9 @@ name: Generate HTML
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   schedule:
-    - cron: '0 * * * *'  # Runs every hour; adjust as needed
+    - cron: '0 * * * *'  # Adjust the schedule as needed
 
 jobs:
   build:
@@ -21,7 +20,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run script
@@ -34,4 +32,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'Update generated HTML [skip ci]'
-          file_pattern: Output/output_image.html
+          file_pattern: docs/*
