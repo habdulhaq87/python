@@ -182,7 +182,7 @@ def main():
             print(f"WARNING: No write access to {output_directory}!")
 
         # Define the path where you want to save the HTML file
-        output_html_path = os.path.join(output_directory, 'output.html')  # Renamed to index.html
+        output_html_path = os.path.join(output_directory, 'index.html')  # Renamed to index.html
 
         # Save the HTML code to the file
         try:
