@@ -30,7 +30,7 @@ jobs:
         run: |
           python script.py
 
-      - name: Add .nojekyll file
+      - name: Create .nojekyll file
         run: |
           touch Output/.nojekyll
 
@@ -40,3 +40,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./Output
           publish_branch: gh-pages
+          force_orphan: true
