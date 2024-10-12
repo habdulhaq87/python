@@ -83,7 +83,7 @@ def main():
     img = Image.open(background_image_path)
 
     # Save the image to a file in the output directory
-    output_directory = 'Output'  # Adjust the path as needed
+    output_directory = 'docs'  # Adjust the path as needed
     os.makedirs(output_directory, exist_ok=True)
     output_image_filename = 'output_image.png'
     output_image_path = os.path.join(output_directory, output_image_filename)
