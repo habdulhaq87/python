@@ -12,7 +12,7 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3  # Removed 'persist-credentials: false'
+        uses: actions/checkout@v3
 
       # Set up Python
       - name: Set up Python
@@ -43,6 +43,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'Update generated HTML [skip ci]'
-          file_pattern: docs/*
-          # Added github_token to ensure authentication
+          file_pattern: 'docs/**'  # Broader pattern to include all files
           github_token: ${{ secrets.GITHUB_TOKEN }}
