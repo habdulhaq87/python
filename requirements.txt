@@ -1,5 +1,4 @@
 pandas
-numpy
 Pillow
 gspread
 oauth2client
