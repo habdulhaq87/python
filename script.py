@@ -243,7 +243,7 @@ def main():
     '''
 
     # Define the path where you want to save the HTML file
-    output_html_path = os.path.join(output_directory, 'output_image.html')
+    output_html_path = os.path.join(output_directory, 'index.html')  # Renamed to index.html
 
     # Save the HTML code to the file
     with open(output_html_path, 'w') as html_file:
