@@ -1,7 +1,5 @@
 # Import required libraries
 from PIL import Image
-import requests
-from io import BytesIO
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
@@ -253,7 +251,7 @@ def main():
 
     print(f"New HTML file saved to {output_html_path}")
 
-    # Create a .nojekyll file in the output directory to disable Jekyll processing on GitHub Pages
+    # Create a .nojekyll file in the output directory
     nojekyll_path = os.path.join(output_directory, '.nojekyll')
     with open(nojekyll_path, 'w') as f:
         pass  # Just create an empty file
