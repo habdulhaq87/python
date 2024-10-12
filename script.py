@@ -96,7 +96,7 @@ def main():
         print("Background image loaded successfully.")
 
         # Save the image to a file in the output directory
-        output_directory = 'docs'  # Save outputs in the 'docs' directory for GitHub Pages
+        output_directory = os.path.join(os.getcwd(), 'docs')  # Save outputs in the 'docs' directory for GitHub Pages
         os.makedirs(output_directory, exist_ok=True)
         output_image_filename = 'output_image.png'
         output_image_path = os.path.join(output_directory, output_image_filename)
