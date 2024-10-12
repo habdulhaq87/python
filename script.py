@@ -5,7 +5,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import textwrap
 import ast
-import math
 import json
 
 # Function to parse string tuples (e.g., "(2103, 167)") into real tuple objects
@@ -13,6 +12,7 @@ def parse_tuple_string(tuple_string):
     try:
         return ast.literal_eval(tuple_string)
     except (ValueError, SyntaxError):
+        print(f"Error parsing tuple string: {tuple_string}")
         return None
 
 # Convert 'font_size' column to integers, handle missing or invalid values
@@ -20,6 +20,7 @@ def parse_font_size(font_size):
     try:
         return int(font_size)
     except (ValueError, TypeError):
+        print(f"Error converting font size: {font_size}")
         return None  # Or you can set a default font size here
 
 # Function to calculate the center of the rectangle and wrap the label text
@@ -44,12 +45,17 @@ def get_centered_position(x0, y0, x1, y1, label, font_size):
 
 def main():
     try:
+        # Debug: Log start of the script
+        print("Script started")
+
         # Authorize the service account for Google Sheets
         print("Loading Google Service Account credentials...")
         # Load credentials from environment variable
         service_account_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON')
         if not service_account_json:
+            print("Error: The environment variable 'GOOGLE_SERVICE_ACCOUNT_JSON' is not set.")
             raise EnvironmentError("The environment variable 'GOOGLE_SERVICE_ACCOUNT_JSON' is not set.")
+        
         service_account_info = json.loads(service_account_json)
         creds = ServiceAccountCredentials.from_json_keyfile_dict(
             service_account_info,
@@ -68,7 +74,7 @@ def main():
 
         # Convert the data to a pandas DataFrame for easier processing
         df = pd.DataFrame(position_data)
-        print("Position DataFrame:")
+        print("Position DataFrame loaded successfully. First 5 rows:")
         print(df.head())
 
         # Apply the function to each of the corner position columns
@@ -76,6 +82,10 @@ def main():
             df[col] = df[col].apply(parse_tuple_string)
 
         df['font_size'] = df['font_size'].apply(parse_font_size)
+
+        # Debug: Ensure data was parsed correctly
+        print("Data after parsing:")
+        print(df.head())
 
         # Initialize SVG code
         svg_elements = []
@@ -147,6 +157,13 @@ def main():
         output_directory = os.path.join(os.getcwd(), 'docs')
         os.makedirs(output_directory, exist_ok=True)
         output_html_path = os.path.join(output_directory, 'index.html')
+
+        # Debug: Checking if directory is writable
+        print(f"Checking write access for: {output_directory}")
+        if os.access(output_directory, os.W_OK):
+            print(f"Write access to {output_directory} confirmed.")
+        else:
+            print(f"WARNING: No write access to {output_directory}!")
 
         # Save the HTML code to the file
         try:
