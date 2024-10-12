@@ -9,7 +9,6 @@ import textwrap
 import ast
 import math
 import os
-import base64
 import json
 
 # Function to parse string tuples (e.g., "(2103, 167)") into real tuple objects
@@ -59,8 +58,14 @@ def generate_offsets(num_points, radius):
 def main():
     # Authorize the service account for Google Sheets
     # Load credentials from environment variable
-    service_account_info = json.loads(os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON'))
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(service_account_info, scopes=["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"])
+    service_account_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON')
+    if not service_account_json:
+        raise EnvironmentError("The environment variable 'GOOGLE_SERVICE_ACCOUNT_JSON' is not set.")
+    service_account_info = json.loads(service_account_json)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        service_account_info,
+        scopes=["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    )
     gc = gspread.authorize(creds)
 
     # Fetch the data from Google Sheets using the service account
@@ -83,7 +88,7 @@ def main():
     img = Image.open(background_image_path)
 
     # Save the image to a file in the output directory
-    output_directory = 'docs'  # Adjust the path as needed
+    output_directory = 'docs'  # Save outputs in the 'docs' directory for GitHub Pages
     os.makedirs(output_directory, exist_ok=True)
     output_image_filename = 'output_image.png'
     output_image_path = os.path.join(output_directory, output_image_filename)
@@ -247,6 +252,13 @@ def main():
         html_file.write(html_code)
 
     print(f"New HTML file saved to {output_html_path}")
+
+    # Create a .nojekyll file in the output directory to disable Jekyll processing on GitHub Pages
+    nojekyll_path = os.path.join(output_directory, '.nojekyll')
+    with open(nojekyll_path, 'w') as f:
+        pass  # Just create an empty file
+
+    print(f"Created .nojekyll in {output_directory}")
 
 if __name__ == '__main__':
     main()
