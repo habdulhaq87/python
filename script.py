@@ -1,4 +1,5 @@
-# Import required libraries
+import os
+import sys  # Added for sys.exit()
 from PIL import Image
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -6,9 +7,7 @@ import pandas as pd
 import textwrap
 import ast
 import math
-import os
 import json
-import sys  # Added for sys.exit()
 
 # Function to parse string tuples (e.g., "(2103, 167)") into real tuple objects
 def parse_tuple_string(tuple_string):
@@ -156,93 +155,6 @@ def main():
                 text_element += '</text>'
                 svg_elements.append(text_element)
 
-        # ------------------- Circle Drawing Code -------------------
-
-        # Now, fetch the points data from the 'points' worksheet
-        print("Fetching points data...")
-        points_sheet = spreadsheet.worksheet('points')
-        points_data = points_sheet.get_all_records()
-        print("Points data fetched successfully.")
-
-        # Convert the points data to a DataFrame
-        points_df = pd.DataFrame(points_data)
-        print("Points DataFrame:")
-        print(points_df.head())
-
-        # Parse the 'Position' column to get the coordinates
-        points_df['Position'] = points_df['Position'].apply(parse_tuple_string)
-
-        # Fetch 'Profiles' worksheet data
-        print("Fetching profiles data...")
-        profiles_sheet = spreadsheet.worksheet('Profiles')
-        profiles_data = profiles_sheet.get_all_records()
-        print("Profiles data fetched successfully.")
-
-        # Convert to DataFrame
-        profiles_df = pd.DataFrame(profiles_data)
-        print("Profiles DataFrame:")
-        print(profiles_df.head())
-
-        # Build a mapping from Profile to color and name
-        profiles_mapping = {}
-        profiles_list = []
-        for index, row in profiles_df.iterrows():
-            profile = row['Profile']
-            color_hex = row['Color']
-            name = row['Name']
-            # Convert hex color to RGB tuple
-            color_rgb = tuple(int(color_hex.strip('#')[i:i+2], 16) for i in (0, 2, 4))
-            color_rgb_str = f'rgb{color_rgb}'
-            profiles_mapping[profile] = {
-                'color': color_rgb_str,
-                'name': name
-            }
-            profiles_list.append(profile)
-
-        # Circle properties
-        circle_radius = 10  # Adjust the circle size as needed
-
-        # Generate offsets dynamically around the circle to prevent overlap
-        offsets_list = generate_offsets(len(profiles_list), circle_radius)
-        # Build offsets dict
-        offsets = {}
-        for profile, offset in zip(profiles_list, offsets_list):
-            offsets[profile] = offset
-
-        # Now, draw the circles for each point based on the profiles
-        for index, row in points_df.iterrows():
-            position = row['Position']
-            if position:
-                x, y = position
-                # For each profile, check if the value is 1
-                for profile in profiles_list:
-                    value = row.get(profile, 0)
-                    if value == 1:
-                        profile_info = profiles_mapping.get(profile)
-                        if profile_info:
-                            color_rgb_str = profile_info['color']
-                            name = profile_info['name']
-                            offset_x, offset_y = offsets.get(profile, (0, 0))
-                            x_adj = x + offset_x
-                            y_adj = y + offset_y
-
-                            # Add circle to SVG elements
-                            circle_element = f'<circle cx="{x_adj}" cy="{y_adj}" r="{circle_radius}" fill="{color_rgb_str}" stroke="{color_rgb_str}"/>'
-                            svg_elements.append(circle_element)
-
-                            # Add the profile name next to the circle
-                            label_font_size = 20  # Adjust as needed
-
-                            # Position the text to the right of the circle
-                            text_x = x_adj + circle_radius + 5  # Slightly offset to the right
-                            text_y = y_adj + label_font_size / 2  # Adjust vertically
-
-                            # Add text element
-                            text_element = f'<text x="{text_x}" y="{text_y}" font-size="{label_font_size}" fill="black">{name}</text>'
-                            svg_elements.append(text_element)
-
-        # ------------------- End of Circle Drawing Code -------------------
-
         # Combine all SVG elements
         for element in svg_elements:
             svg_code += element + '\n'
@@ -262,14 +174,25 @@ def main():
         </html>
         '''
 
+        # Check if the docs directory is writable
+        print(f"Checking write access for: {output_directory}")
+        if os.access(output_directory, os.W_OK):
+            print(f"Write access to {output_directory} confirmed.")
+        else:
+            print(f"WARNING: No write access to {output_directory}!")
+
         # Define the path where you want to save the HTML file
         output_html_path = os.path.join(output_directory, 'index.html')  # Renamed to index.html
 
         # Save the HTML code to the file
-        with open(output_html_path, 'w') as html_file:
-            html_file.write(html_code)
-
-        print(f"New HTML file saved to {output_html_path}")
+        try:
+            print(f"Attempting to save HTML to {output_html_path}")
+            with open(output_html_path, 'w') as html_file:
+                html_file.write(html_code)
+            print(f"New HTML file saved to {output_html_path}")
+        except Exception as e:
+            print(f"Error saving HTML file: {e}")
+            raise
 
         # Create a .nojekyll file in the output directory
         nojekyll_path = os.path.join(output_directory, '.nojekyll')
