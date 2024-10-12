@@ -7,7 +7,7 @@ import textwrap
 import ast
 import json
 
-# Function to parse string tuples (e.g., "(2103, 167)") into real tuple objects
+# Function to parse string tuples (e.g., "(2103, 167)") into real tuple xobjects
 def parse_tuple_string(tuple_string):
     try:
         return ast.literal_eval(tuple_string)
