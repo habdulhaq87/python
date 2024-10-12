@@ -1,4 +1,4 @@
-name: Generate HTML
+name: Generate and Deploy HTML
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '0 * * * *'  # Runs every hour; adjust as needed
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -30,8 +30,9 @@ jobs:
         run: |
           python script.py
 
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          commit_message: 'Update generated HTML [skip ci]'
-          file_pattern: Output/output_image.html
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./Output
+          publish_branch: gh-pages
