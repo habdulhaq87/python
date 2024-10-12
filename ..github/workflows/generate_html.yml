@@ -50,13 +50,15 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      # Step 8: Commit changes to the docs/ directory
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'Update generated HTML [skip ci]'
-          file_pattern: 'docs/**'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+# Step 8: Commit changes
+- name: Commit changes
+  uses: stefanzweifel/git-auto-commit-action@v4
+  with:
+    commit_message: 'Update generated HTML [skip ci]'
+    file_pattern: 'docs/**'
+    untracked_files: 'add'  # Add this line
+    github_token: ${{ secrets.GITHUB_TOKEN }}
+
 
       # Step 9: Upload debug logs and environment variables
       - name: Upload debug information
