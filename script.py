@@ -1,6 +1,5 @@
 import os
-import sys  # Added for sys.exit()
-from PIL import Image
+import sys
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
@@ -43,16 +42,6 @@ def get_centered_position(x0, y0, x1, y1, label, font_size):
 
     return text_x, text_y, wrapped_text
 
-# Function to generate offsets to prevent overlap
-def generate_offsets(num_points, radius):
-    offsets = []
-    for i in range(num_points):
-        angle = 2 * math.pi * i / num_points
-        offset_x = radius * 2 * math.cos(angle)
-        offset_y = radius * 2 * math.sin(angle)
-        offsets.append((offset_x, offset_y))
-    return offsets
-
 def main():
     try:
         # Authorize the service account for Google Sheets
@@ -88,32 +77,12 @@ def main():
 
         df['font_size'] = df['font_size'].apply(parse_font_size)
 
-        # Load the background image from the local repository
-        background_image_path = 'background.jpg'  # Ensure this image is in the repository
-        if not os.path.exists(background_image_path):
-            raise FileNotFoundError(f"Background image not found at {background_image_path}")
-        img = Image.open(background_image_path)
-        print("Background image loaded successfully.")
-
-        # Save the image to a file in the output directory
-        output_directory = os.path.join(os.getcwd(), 'docs')  # Save outputs in the 'docs' directory for GitHub Pages
-        os.makedirs(output_directory, exist_ok=True)
-        output_image_filename = 'output_image.png'
-        output_image_path = os.path.join(output_directory, output_image_filename)
-
-        # Save the image
-        img.save(output_image_path, format='PNG')
-        print(f"Background image saved to {output_image_path}")
-
-        # Get image dimensions
-        img_width, img_height = img.size
-
         # Initialize SVG code
         svg_elements = []
 
-        # Add the image as the background
-        svg_code = f'''<svg width="{img_width}" height="{img_height}" xmlns="http://www.w3.org/2000/svg">
-          <image href="{output_image_filename}" x="0" y="0" width="{img_width}" height="{img_height}"/>
+        # Add a placeholder background (a plain white rectangle)
+        svg_code = f'''<svg width="1000" height="1000" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1000" height="1000" style="fill:white;" />
         '''
 
         # Loop through the DataFrame and add each label to the SVG
@@ -166,7 +135,7 @@ def main():
         html_code = f'''<!DOCTYPE html>
         <html>
         <head>
-            <title>Output Image</title>
+            <title>Generated HTML</title>
         </head>
         <body>
             {svg_code}
@@ -174,15 +143,10 @@ def main():
         </html>
         '''
 
-        # Check if the docs directory is writable
-        print(f"Checking write access for: {output_directory}")
-        if os.access(output_directory, os.W_OK):
-            print(f"Write access to {output_directory} confirmed.")
-        else:
-            print(f"WARNING: No write access to {output_directory}!")
-
         # Define the path where you want to save the HTML file
-        output_html_path = os.path.join(output_directory, 'index.html')  # Renamed to index.html
+        output_directory = os.path.join(os.getcwd(), 'docs')
+        os.makedirs(output_directory, exist_ok=True)
+        output_html_path = os.path.join(output_directory, 'index.html')
 
         # Save the HTML code to the file
         try:
