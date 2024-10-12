@@ -1,4 +1,4 @@
-name: Generate and Deploy HTML
+name: Generate HTML
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '0 * * * *'  # Runs every hour; adjust as needed
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -30,14 +30,8 @@ jobs:
         run: |
           python script.py
 
-      - name: Create .nojekyll file
-        run: |
-          touch Output/.nojekyll
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./Output
-          publish_branch: gh-pages
-          force_orphan: true
+          commit_message: 'Update generated HTML [skip ci]'
+          file_pattern: Output/output_image.html
