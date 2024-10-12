@@ -12,9 +12,7 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
+        uses: actions/checkout@v3  # Removed 'persist-credentials: false'
 
       # Set up Python
       - name: Set up Python
@@ -46,3 +44,5 @@ jobs:
         with:
           commit_message: 'Update generated HTML [skip ci]'
           file_pattern: docs/*
+          # Added github_token to ensure authentication
+          github_token: ${{ secrets.GITHUB_TOKEN }}
